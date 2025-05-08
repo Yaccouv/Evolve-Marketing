@@ -63,5 +63,5 @@ finalConfig.webpack = (config, { isServer }) => {
   };
   return config;
 };
-
+console.log(finalConfig);
 export default finalConfig;
