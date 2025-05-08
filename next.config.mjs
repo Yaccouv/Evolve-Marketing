@@ -16,6 +16,7 @@ const baseConfig = {
     parallelServerBuildTraces: false,
     parallelServerCompiles: false,
   },
+  output: 'export',  // <-- Add this line for static export
 };
 
 let userConfig = undefined;
@@ -63,5 +64,7 @@ finalConfig.webpack = (config, { isServer }) => {
   };
   return config;
 };
+
 console.log(finalConfig);
+
 export default finalConfig;
