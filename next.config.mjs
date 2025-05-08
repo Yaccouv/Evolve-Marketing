@@ -1,14 +1,13 @@
-let userConfig = undefined;
-
+let userConfig = undefined
 try {
-  // Try to import ESM first
-  userConfig = await import('./v0-user-next.config.mjs');
+  // try to import ESM first
+  userConfig = await import('./v0-user-next.config.mjs')
 } catch (e) {
   try {
-    // Fallback to CJS import
-    userConfig = await import('./v0-user-next.config');
+    // fallback to CJS import
+    userConfig = await import("./v0-user-next.config");
   } catch (innerError) {
-    // Ignore error if both imports fail
+    // ignore error
   }
 }
 
@@ -21,19 +20,18 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,  // Optional: you can optimize images later if needed
+    unoptimized: true,
   },
   experimental: {
-    // Disable experimental features to avoid memory issues during build
-    webpackBuildWorker: false,
-    parallelServerBuildTraces: false,
-    parallelServerCompiles: false,
+    webpackBuildWorker: true,
+    parallelServerBuildTraces: true,
+    parallelServerCompiles: true,
   },
-};
+}
 
-// Merge user config if it exists
 if (userConfig) {
-  const config = userConfig.default || userConfig;
+  // ESM imports will have a "default" property
+  const config = userConfig.default || userConfig
 
   for (const key in config) {
     if (
@@ -43,11 +41,11 @@ if (userConfig) {
       nextConfig[key] = {
         ...nextConfig[key],
         ...config[key],
-      };
+      }
     } else {
-      nextConfig[key] = config[key];
+      nextConfig[key] = config[key]
     }
   }
 }
 
-export default nextConfig;
+export default nextConfig

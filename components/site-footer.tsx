@@ -20,18 +20,6 @@ export function SiteFooter() {
               <Link href="/" className="text-gray-300 hover:text-white">
                 Home
               </Link>
-              <Link href="#" className="text-gray-300 hover:text-white">
-                About Us
-              </Link>
-              <Link href="#" className="text-gray-300 hover:text-white">
-                Products
-              </Link>
-              <Link href="#" className="text-gray-300 hover:text-white">
-                Gallery
-              </Link>
-              <Link href="#" className="text-gray-300 hover:text-white">
-                Contact
-              </Link>
             </nav>
           </div>
 
