@@ -1,3 +1,5 @@
+import path from 'path';
+
 /** @type {import('next').NextConfig} */
 const baseConfig = {
   eslint: {
@@ -10,9 +12,9 @@ const baseConfig = {
     unoptimized: true,
   },
   experimental: {
-    parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
-    // webpackBuildWorker: true, // ❌ Removed due to instability
+    // Disable parallel build options
+    parallelServerBuildTraces: false,
+    parallelServerCompiles: false,
   },
 };
 
@@ -45,6 +47,21 @@ const mergeDeep = (target, source) => {
   return target;
 };
 
+// Use `import.meta.url` to get the current directory in an ESM environment
+const getDirname = (url) => {
+  const fileURL = new URL(url);
+  return path.dirname(fileURL.pathname);
+};
+
 const finalConfig = userConfig ? mergeDeep(baseConfig, userConfig) : baseConfig;
+
+// Add the webpack alias setup to resolve the @ alias
+finalConfig.webpack = (config, { isServer }) => {
+  config.resolve.alias = {
+    ...config.resolve.alias,
+    '@': path.resolve(getDirname(import.meta.url)), // Use import.meta.url to resolve path
+  };
+  return config;
+};
 
 export default finalConfig;
