@@ -1,18 +1,5 @@
-let userConfig = undefined
-try {
-  // try to import ESM first
-  userConfig = await import('./v0-user-next.config.mjs')
-} catch (e) {
-  try {
-    // fallback to CJS import
-    userConfig = await import("./v0-user-next.config");
-  } catch (innerError) {
-    // ignore error
-  }
-}
-
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const baseConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -23,29 +10,41 @@ const nextConfig = {
     unoptimized: true,
   },
   experimental: {
-    webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+    // webpackBuildWorker: true, // ❌ Removed due to instability
   },
-}
+};
 
-if (userConfig) {
-  // ESM imports will have a "default" property
-  const config = userConfig.default || userConfig
+let userConfig = undefined;
 
-  for (const key in config) {
-    if (
-      typeof nextConfig[key] === 'object' &&
-      !Array.isArray(nextConfig[key])
-    ) {
-      nextConfig[key] = {
-        ...nextConfig[key],
-        ...config[key],
-      }
-    } else {
-      nextConfig[key] = config[key]
-    }
+try {
+  // Try ESM config first
+  userConfig = (await import('./v0-user-next.config.mjs')).default;
+} catch (esmError) {
+  try {
+    // Fallback to CommonJS
+    userConfig = (await import('./v0-user-next.config')).default;
+  } catch (cjsError) {
+    console.warn('⚠️ No custom user Next.js config found. Using base configuration.');
   }
 }
 
-export default nextConfig
+const mergeDeep = (target, source) => {
+  for (const key of Object.keys(source)) {
+    if (
+      typeof source[key] === 'object' &&
+      !Array.isArray(source[key]) &&
+      typeof target[key] === 'object'
+    ) {
+      target[key] = mergeDeep({ ...target[key] }, source[key]);
+    } else {
+      target[key] = source[key];
+    }
+  }
+  return target;
+};
+
+const finalConfig = userConfig ? mergeDeep(baseConfig, userConfig) : baseConfig;
+
+export default finalConfig;
